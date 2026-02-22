@@ -129,3 +129,78 @@ Despite using a constrained dataset of only **15,000 samples**, the model has su
 
 The "hallucinations" (like *Hello* → *Run*) are simply a result of **Data Sparsity**. The architecture itself is robust; increasing the dataset would refine the **Vector Space resolution**, moving the model from basic word-matching to fluent, nuanced translation.
 
+```mermaid
+graph TD
+    A["Configuration<br/>MODE: E2M/M2E<br/>latent_dim: 256"] --> B["Data Loading & Preprocessing"]
+    
+    B --> C["Load Dataset<br/>mar.txt"]
+    C --> D["Normalize Text<br/>Lowercase & Strip"]
+    D --> E["Select Mode<br/>E2M or M2E"]
+    
+    E --> F["Tokenization"]
+    F --> G["Input Tokenizer"]
+    F --> H["Target Tokenizer"]
+    
+    G --> I["Input Sequences"]
+    H --> J["Target Sequences"]
+    
+    I --> K["Pad Sequences"]
+    J --> K
+    
+    K --> L{"TRAIN_MODE?"}
+    
+    L -->|YES| M["Training Phase"]
+    L -->|NO| N["Inference Phase"]
+    
+    M --> O["Encoder Architecture"]
+    O --> O1["Embedding Layer"]
+    O1 --> O2["Bidirectional LSTM"]
+    O2 --> O3["Concatenate States<br/>Hidden & Cell"]
+    O3 --> S["Save Model & Tokenizers"]
+    
+    M --> P["Decoder Architecture"]
+    P --> P1["Embedding Layer"]
+    P1 --> P2["LSTM Layer"]
+    P2 --> P3["Dense Layer<br/>Softmax Activation"]
+    P3 --> Q["Compile & Train<br/>Categorical Crossentropy"]
+    Q --> R["Callbacks<br/>EarlyStopping & Checkpoint"]
+    R --> S
+    
+    N --> T["Load Trained Model"]
+    T --> U["Load Tokenizers"]
+    
+    U --> V["Reconstruct Encoder"]
+    V --> V1["Extract BiLSTM Layer"]
+    V1 --> V2["Combine Forward/Backward States"]
+    V2 --> W["Encoder Inference Model"]
+    
+    U --> X["Reconstruct Decoder"]
+    X --> X1["Input: Hidden & Cell States"]
+    X1 --> X2["Input: Single Word Token"]
+    X2 --> X3["Extract Embedding Layer"]
+    X3 --> X4["Extract LSTM Layer"]
+    X4 --> X5["Extract Dense Layer"]
+    X5 --> Y["Decoder Inference Model"]
+    
+    W --> Z["Translate Function"]
+    Y --> Z
+    
+    Z --> Z1["Tokenize Input"]
+    Z1 --> Z2["Pad Input Sequence"]
+    Z2 --> Z3["Encoder Prediction<br/>Get Initial States"]
+    Z3 --> Z4["Greedy Decoding Loop"]
+    
+    Z4 --> Z5["Decoder Prediction<br/>One Word at a Time"]
+    Z5 --> Z6["Argmax to Select Word"]
+    Z6 --> Z7{"Stop Condition?<br/>end token or<br/>max length"}
+    Z7 -->|NO| Z8["Append to Output<br/>Update States"]
+    Z8 --> Z5
+    Z7 -->|YES| Z9["Return Translation"]
+    
+    Z9 --> AA["Interactive Loop<br/>User Input/Output"]
+
+    style A fill:#e1f5ff
+    style M fill:#c8e6c9
+    style N fill:#fff9c4
+    style Z fill:#ffccbc
+    style AA fill:#f0f4c3
