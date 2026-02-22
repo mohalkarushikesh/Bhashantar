@@ -111,6 +111,10 @@ Translation: आक्रमण कर.
 
 ---
 
+License: Do What the F* You Want to Public License — http://www.wtfpl.net
+
+---
+
 ## Conclusion: 
 
 Despite using a constrained dataset of only **15,000 samples**, the model has successfully achieved a **Proof of Concept** for Neural Machine Translation. It demonstrates that a **Bidirectional Seq2Seq** architecture can autonomously learn the complex grammatical shift from **English (SVO)** to **Marathi (SOV)** without hardcoded rules.
